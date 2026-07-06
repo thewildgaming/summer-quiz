@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<title>Summer Vacation Work Quiz</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(#ffc9de, #ffb3d1);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ---------- Clouds ---------- */
+  .cloud {
+    position: absolute;
+    background: #ffffff;
+    border-radius: 50px;
+    opacity: 0.9;
+    animation: floatCloud linear infinite;
+  }
+  .cloud::before, .cloud::after {
+    content: "";
+    position: absolute;
+    background: #ffffff;
+    border-radius: 50%;
+  }
+  .cloud1 { width: 100px; height: 35px; top: 40px; left: -150px; animation-duration: 25s; }
+  .cloud1::before { width: 50px; height: 50px; top: -20px; left: 10px; }
+  .cloud1::after  { width: 60px; height: 60px; top: -25px; left: 45px; }
+
+  .cloud2 { width: 140px; height: 45px; top: 120px; left: -200px; animation-duration: 35s; animation-delay: 5s;}
+  .cloud2::before { width: 60px; height: 60px; top: -25px; left: 15px; }
+  .cloud2::after  { width: 70px; height: 70px; top: -30px; left: 60px; }
+
+  .cloud3 { width: 90px; height: 30px; top: 220px; left: -150px; animation-duration: 30s; animation-delay: 12s;}
+  .cloud3::before { width: 40px; height: 40px; top: -18px; left: 10px; }
+  .cloud3::after  { width: 50px; height: 50px; top: -22px; left: 40px; }
+
+  @keyframes floatCloud {
+    from { transform: translateX(0); }
+    to   { transform: translateX(120vw); }
+  }
+
+  /* ---------- Sparrows ---------- */
+  .bird {
+    position: absolute;
+    font-size: 22px;
+    animation: flyBird linear infinite;
+    animation-name: flyBird, flap;
+  }
+  .bird1 { top: 60px;  left: -50px; animation-duration: 8s, 0.6s; }
+  .bird2 { top: 150px; left: -100px; animation-duration: 11s, 0.5s; animation-delay: 2s, 0s; }
+  .bird3 { top: 90px;  left: -80px; animation-duration: 9s, 0.55s; animation-delay: 4s, 0s; }
+  .bird4 { top: 200px; left: -120px; animation-duration: 13s, 0.65s; animation-delay: 1s, 0s; }
+
+  @keyframes flyBird {
+    from { transform: translateX(0); }
+    to   { transform: translateX(120vw); }
+  }
+  @keyframes flap {
+    0%, 100% { content: "🐦"; }
+  }
+
+  /* ---------- Screens ---------- */
+  .screen {
+    position: relative;
+    z-index: 2;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    min-height: 100vh;
+    justify-content: center;
+    text-align: center;
+  }
+  .screen.active { display: flex; }
+
+  h1.title {
+    color: #0b3d91;
+    font-weight: 900;
+    font-size: 2.4em;
+    margin-bottom: 40px;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.6);
+  }
+
+  .play-box {
+    background: #8b5a2b;
+    color: #000000;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 20px 50px;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+    transition: transform 0.2s;
+    user-select: none;
+  }
+  .play-box:hover { transform: scale(1.05); }
+
+  .question-number {
+    align-self: flex-start;
+    color: #0b3d91;
+    font-weight: 900;
+    font-size: 1.6em;
+    margin: 0 0 10px 30px;
+  }
+
+  .question-text {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #2b2b2b;
+    margin-bottom: 30px;
+    max-width: 700px;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .option-box {
+    background: #8b5a2b;
+    color: #000000;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 5px 8px rgba(0,0,0,0.25);
+    transition: transform 0.15s;
+  }
+  .option-box:hover { transform: scale(1.03); }
+
+  .option-box.correct {
+    color: #0a8a0a;
+  }
+  .option-box.wrong {
+    color: #d10000;
+  }
+  .option-box.disabled {
+    pointer-events: none;
+  }
+  .option-box.selected-neutral {
+    color: #0b3d91;
+  }
+
+  .next-btn {
+    margin-top: 30px;
+    background: #0b3d91;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 1.1em;
+    padding: 12px 35px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    display: none;
+  }
+  .next-btn.show { display: inline-block; }
+
+  .thank-you {
+    color: #0b3d91;
+    font-size: 2em;
+    font-weight: 900;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.6);
+  }
+</style>
+</head>
+<body>
+
+  <!-- Background decorations -->
+  <div class="cloud cloud1"></div>
+  <div class="cloud cloud2"></div>
+  <div class="cloud cloud3"></div>
+  <div class="bird bird1">🐦</div>
+  <div class="bird bird2">🐦</div>
+  <div class="bird bird3">🐦</div>
+  <div class="bird bird4">🐦</div>
+
+  <!-- Start Screen -->
+  <div class="screen active" id="startScreen">
+    <h1 class="title">SUMMER VACATION WORK</h1>
+    <div class="play-box" onclick="startQuiz()">PLAY QUIZ</div>
+  </div>
+
+  <!-- Quiz Screen -->
+  <div class="screen" id="quizScreen">
+    <div class="question-number" id="questionNumber">Question 1</div>
+    <div class="question-text" id="questionText"></div>
+    <div class="options" id="optionsContainer"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+  </div>
+
+  <!-- Thank You Screen -->
+  <div class="screen" id="endScreen">
+    <div class="thank-you">Thank you for visiting my website!</div>
+  </div>
+
+<script>
+  const questions = [
+    {
+      q: "What is Shoaib's favourite subject?",
+      options: ["English", "Math", "S.S.T"],
+      correct: 1
+    },
+    {
+      q: "Who is Shoaib's favourite teacher?",
+      options: ["Miss Aqsa", "Miss Saba", "All"],
+      correct: 2
+    },
+    {
+      q: "Who is Shoaib's best friend?",
+      options: ["Abdul Hadi", "Anus Gull", "Salar"],
+      correct: 0
+    },
+    {
+      q: "Shoaib's study is good or bad?",
+      options: ["Good", "Bad", "Normal"],
+      correct: 0
+    },
+    {
+      q: "Do you like this website?",
+      options: ["Yes", "No"],
+      correct: -1 // opinion question, no right/wrong
+    }
+  ];
+
+  let currentQuestion = 0;
+
+  function startQuiz() {
+    document.getElementById('startScreen').classList.remove('active');
+    document.getElementById('quizScreen').classList.add('active');
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    const data = questions[currentQuestion];
+    document.getElementById('questionNumber').textContent = "Question " + (currentQuestion + 1);
+    document.getElementById('questionText').textContent = data.q;
+
+    const container = document.getElementById('optionsContainer');
+    container.innerHTML = "";
+
+    data.options.forEach((optText, index) => {
+      const box = document.createElement('div');
+      box.className = "option-box";
+      box.textContent = optText;
+      box.onclick = () => selectOption(index, box);
+      container.appendChild(box);
+    });
+
+    document.getElementById('nextBtn').classList.remove('show');
+  }
+
+  function selectOption(index, box) {
+    const data = questions[currentQuestion];
+    const allBoxes = document.querySelectorAll('.option-box');
+
+    // disable further clicks
+    allBoxes.forEach(b => b.classList.add('disabled'));
+
+    if (data.correct === -1) {
+      // opinion question, just mark selected
+      box.classList.add('selected-neutral');
+      box.textContent = optTextWithLabel(box.textContent, "Thanks!");
+    } else if (index === data.correct) {
+      box.classList.add('correct');
+      box.textContent = optTextWithLabel(box.textContent, "Correct");
+    } else {
+      box.classList.add('wrong');
+      box.textContent = optTextWithLabel(box.textContent, "Wrong");
+      // also show correct answer in green
+      allBoxes[data.correct].classList.add('correct');
+      allBoxes[data.correct].textContent = optTextWithLabel(allBoxes[data.correct].textContent, "Correct");
+    }
+
+    document.getElementById('nextBtn').classList.add('show');
+  }
+
+  function optTextWithLabel(original, label) {
+    // avoid double labeling
+    const base = original.split(" - ")[0];
+    return base + " - " + label;
+  }
+
+  function nextQuestion() {
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
+      loadQuestion();
+    } else {
+      document.getElementById('quizScreen').classList.remove('active');
+      document.getElementById('endScreen').classList.add('active');
+    }
+  }
+</script>
+
+</body>
+</html>
